@@ -1,0 +1,3 @@
+This is a project that allows users to create and send bets to their friends. 
+
+By: Wendell Rodrigues
