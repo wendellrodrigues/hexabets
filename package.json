@@ -4,8 +4,10 @@
   "description": "Social betting application ",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "server": "nodemon server.js"
   },
+  "proxy": "http://localhost:5000/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wendellrodrigues/hexabets.git"
