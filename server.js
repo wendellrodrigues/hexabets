@@ -27,10 +27,10 @@ mongoose
 app.get('/', (req, res) => res.send('Hello'));
 
 // Passport Middleware
-//app.use(passport.initialize());
+app.use(passport.initialize());
 
-// Passport Config
-//require('./config/passport')(passport);
+//Passport Config
+require('./config/passport')(passport);
 
 // Use Routes
 app.use('/api/users', users);

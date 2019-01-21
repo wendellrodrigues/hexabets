@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Create schema for a user
-const UserSchema = new Schema({
+/**
+ *  PartialUser
+ *  Partial Users are users that have just signed up and have
+ */
+const PartialUserSchema = new Schema({
   firstName: {
     type: String,
     required: true
@@ -19,22 +22,18 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
-  password: {
-    type: String,
-    required: true
-  },
-  date: {
-    type: Date,
-    default: Date.now
-  },
+
   phoneVerified: {
     type: Boolean,
+    default: false,
     required: true
+  }, 
+
+  phoneVerificationID: {
+    type: String,
+    default: '',
   }
-
-  //TODO: Create avatar 
-
-  
+ 
 });
 
-module.exports = User = mongoose.model('users', UserSchema);
+module.exports = PartialUser = mongoose.model('partialUsers', PartialUserSchema);
