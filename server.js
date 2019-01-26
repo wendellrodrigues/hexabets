@@ -2,18 +2,15 @@ const express       = require('express');
 const mongoose      = require('mongoose');
 const bodyParser    = require('body-parser');
 const passport      = require('passport');
+const morgan        = require('morgan');
 const path          = require('path');
 
 const users = require('./routes/api/users');
 const profile = require('./routes/api/profile')
 
-// Initialization of the express application
-const app = express();
+//Passport Config
+require('./config/passport')(passport);
 
-// Body Parser Middleware
-// Body parser parses HTTP requests into readable json format
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
 
 // MongoDB Atlas Configuration
 const db = require('./config/keys').mongoURI;
@@ -24,19 +21,32 @@ mongoose
     .then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
 
-app.get('/', (req, res) => res.send('Hello'));
 
-// Passport Middleware
+// Initialization of the express application
+const app = express();
+
+// Middlewares
+
+//Morgan Midleware (for looking through the req, res. DELETE LATER)
+app.use(morgan('dev'));
+
+// Body parser Middleware parses HTTP requests into readable json format
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
+// Passport Middleware (For tokens and authorization)
 app.use(passport.initialize());
 
-//Passport Config
-require('./config/passport')(passport);
+
+//Test route
+app.get('/', (req, res) => res.send('Hello'));
+
 
 // Use Routes
 app.use('/api/users', users);
 app.use('/api/profile', profile);
 
 
+//Start the server
 const port = process.env.PORT || 5000;
-
 app.listen(port, () => console.log(`Hexabets server running on localhost port ${port}`));

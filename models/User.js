@@ -1,13 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Create schema for a user
+// Create Schema
 const UserSchema = new Schema({
-  firstName: {
-    type: String,
-    required: true
-  },
-  lastName: {
+  name: {
     type: String,
     required: true
   },
@@ -15,26 +11,19 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
-  mobilePhone: {
+  password: {
     type: String,
     required: true
   },
-  password: {
+  password2: {
     type: String,
     required: true
   },
   date: {
     type: Date,
     default: Date.now
-  },
-  phoneVerified: {
-    type: Boolean,
-    required: true
   }
-
-  //TODO: Create avatar 
-
-  
 });
 
 module.exports = User = mongoose.model('users', UserSchema);
+
