@@ -5,6 +5,10 @@ module.exports = {
 
   register: async(req, res, next) => {
 
+    if(req.errors) {
+      console.log('received errors')
+    }
+
     // Receives: email & password
     const{ 
       name,

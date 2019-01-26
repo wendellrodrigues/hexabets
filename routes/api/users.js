@@ -1,7 +1,9 @@
 const express                   = require('express'); //To use the router
 const router                    = require('express-promise-router')();
 const UsersController           = require('../../controllers/users');
-const { validateBody, schemas}  = require('../../helpers/routeHelpers');
+const { validateRegister, 
+        
+                     }          = require('../../helpers/routeHelpers');
 
 
 const bcrypt    = require('bcryptjs'); //For hashing passwords
@@ -22,7 +24,7 @@ const User = require('../../models/User');
 router
   .route('/register')
   .post(
-    validateBody(), 
+    validateRegister(), 
     UsersController.register);
  
 

@@ -7,16 +7,16 @@ module.exports = {
 
   //Can replace all this with own custom validation like devconnector project
 
-  validateBody: () => {  
+  validateRegister: () => {  
     return(req, res, next) => {   // Passed in as middleware from the api before it goes to the controller
 
       const { errors, isValid } = validateRegisterInput(req.body);  //request comes from the route
 
       //If any errors are found
-      if(errors.length > 0) {
-        req.value['body'] = errors;
-        return res.status(400).json({errors, isValid})
-      } 
+      if(Object.keys(errors).length > 0) {
+        return res.status(400).json({errors})
+      }
+
 
       next(); //So it goes on to next middleware (from UserController)
     }
