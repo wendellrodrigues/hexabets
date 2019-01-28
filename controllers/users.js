@@ -6,23 +6,19 @@ const { JSONWebToken }      = require('../config/keys');
 
 
 signToken = (payload) => {
-
   //Secret key
   const key = JSONWebToken.secret;
-
   //Signing Options for JWT payload
   const signOptions = {
     issuer: 'hexabets',
     expiresIn: '24h'
   }
-
   //Create token
   const token = jwt.sign(payload.toJSON(), key, signOptions)
-  
   //return Bearer token
   return 'Bearer ' + token;
-
 }
+
 
 module.exports = {
 
@@ -76,6 +72,7 @@ module.exports = {
 
   secret: async(req, res, next) => {
     console.log('UserController.secret() called')
+    res.json({ secret: 'Secret accessed' });
   },
 
 

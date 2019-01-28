@@ -32,7 +32,7 @@ passport.use(new JwtStrategy(opts, (payload, done) => {
     done(null, false);
 
   } catch(err) {
-    console.log(err);
+    done(err, false);
   }
 }))
 
