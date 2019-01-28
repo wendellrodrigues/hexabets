@@ -24,7 +24,6 @@ const User = require('../../models/User');
 router
   .route('/register')
   .post(
-    validateRegister(), 
     UsersController.register);
  
 

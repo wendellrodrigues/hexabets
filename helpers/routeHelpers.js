@@ -1,3 +1,5 @@
+//CAN DELETE THIS WHOLE FILE, NOT NEEDED
+
 const Joi     = require('joi');
 
 //const User                  = require('../models/User');
@@ -13,7 +15,7 @@ module.exports = {
       const { errors, isValid } = validateRegisterInput(req.body);  //request comes from the route
 
       //If any errors are found
-      if(Object.keys(errors).length > 0) {
+      if(!isValid) {
         return res.status(400).json({errors})
       }
 
