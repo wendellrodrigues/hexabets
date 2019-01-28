@@ -5,14 +5,23 @@ const validateRegisterInput = require('../validation/register');
 const { JSONWebToken }      = require('../config/keys');
 
 
-// Function for signing JSON Web Tokens
-signToken = user => {
-  return jwt.sign({
-    iss: 'hexabets',                                  // Issued by:   Can be anything like name of company
-    sub: user._id,                                    // Subject:     Has to be unique
-    iat: new Date().getTime(),                        // Issued at:   Current time
-    exp: new Date().setDate(new Date().getDate + 1)   // Expires at: 1 day ahead
-  }, JSONWebToken.secret)
+signToken = (payload) => {
+
+  //Secret key
+  const key = JSONWebToken.secret;
+
+  //Signing Options for JWT payload
+  const signOptions = {
+    issuer: 'hexabets',
+    expiresIn: '24h'
+  }
+
+  //Create token
+  const token = jwt.sign(payload.toJSON(), key, signOptions)
+  
+  //return Bearer token
+  return 'Bearer ' + token;
+
 }
 
 module.exports = {
@@ -51,7 +60,7 @@ module.exports = {
     // Save user to database                      
     await newUser.save();   //Waits for newUser to be saved to database before next line is processed
 
-    // Create jwt token
+    //Create token
     const token = signToken(newUser);
 
     // Respond with token

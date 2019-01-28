@@ -9,7 +9,7 @@ const users = require('./routes/api/users');
 const profile = require('./routes/api/profile')
 
 //Passport Config
-require('./config/passport')(passport);
+require('./config/passport')//(passport);
 
 
 // MongoDB Atlas Configuration

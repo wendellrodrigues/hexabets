@@ -1,5 +1,5 @@
 const express                   = require('express'); //To use the router
-const router                    = require('express-promise-router')();
+const router                    = require('express-promise-router')();     // To avoid try-catch
 const UsersController           = require('../../controllers/users');
 const { validateRegister, 
         
@@ -11,7 +11,8 @@ const jwt       = require('jsonwebtoken');
 const keys      = require('../../config/keys');
 
 
-const passport     = require('passport');
+const passport        = require('passport');
+const passportConfig  = require('../../config/passport')
 
 //Load User model
 const User = require('../../models/User');
@@ -33,7 +34,10 @@ router
 
 router
   .route('/secret')
-  .get(UsersController.secret);
+  .get(
+    passport.authenticate('jwt', { session: false }),
+    UsersController.secret
+  );
 
 
 
