@@ -7,7 +7,9 @@ const validateRegisterInput = require('../validation/register');
 const validateLoginInput = require('../validation/login');
 
 
-
+/**
+ * Sign a JWT Token 
+ */
 signToken = (payload) => {
   //Secret key
   const key = JSONWebToken.secret;
@@ -60,7 +62,12 @@ module.exports = {
       res.send(200).json({ errors })
     }
 
-    console.log('UserController.login() called')
+    //Generate token (we have access to req.user)
+    const token = signToken(req.user);
+
+    //Respond with token
+    res.status(200).json({ token })
+
   },
 
   secret: async(req, res, next) => {
