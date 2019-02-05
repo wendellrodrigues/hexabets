@@ -2,7 +2,7 @@ const express                   = require('express'); //To use the router
 const router                    = require('express-promise-router')();     // To avoid try-catch
 const UsersController           = require('../../controllers/users');
 const { validateRegister, 
-        
+        validateLogin
                      }          = require('../../helpers/routeHelpers');
 
 
@@ -25,12 +25,17 @@ const User = require('../../models/User');
 router
   .route('/register')
   .post(
+    validateRegister,
     UsersController.register);
  
 
 router
   .route('/login')
-  .post(UsersController.login);
+  .post(
+    validateLogin,
+    passport.authenticate('local', { session: false }),
+    UsersController.login
+  );
 
 router
   .route('/secret')

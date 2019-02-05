@@ -1,8 +1,11 @@
 const jwt                   = require('jsonwebtoken');
 
 const User                  = require('../models/User');
-const validateRegisterInput = require('../validation/register');
 const { JSONWebToken }      = require('../config/keys');
+
+const validateRegisterInput = require('../validation/register');
+const validateLoginInput = require('../validation/login');
+
 
 
 signToken = (payload) => {
@@ -24,33 +27,17 @@ module.exports = {
 
   register: async(req, res, next) => {
 
-    const { errors, isValid } = validateRegisterInput(req.body);  //request comes from the route
-
     const{  
       name,
       email, 
       password,
-      password2
       } = req.body;
-
-    // Check if any form errors are found
-    if(!isValid) {
-      return res.status(400).json({ errors })
-    }
-
-    // Check if user already exists by email
-    const foundUser = await User.findOne(req.body); 
-    if(foundUser) {
-      errors.email = 'Email already exists';
-      return res.status(403).json({ errors });  //403 means forbidden
-    }
 
     // Create new user
     const newUser = new User({ 
                           name,
                           email, 
                           password,
-                          password2
                           });
 
     // Save user to database                      
@@ -66,7 +53,13 @@ module.exports = {
 
 
   login: async(req, res, next) => {
-    // Generate token 
+    const { errors, isValid } = validateLoginInput(req.body);
+
+    //Check form errors
+    if(!isValid) { 
+      res.send(200).json({ errors })
+    }
+
     console.log('UserController.login() called')
   },
 

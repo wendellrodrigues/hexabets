@@ -1,5 +1,6 @@
 const passport          = require('passport');
 const JwtStrategy       = require('passport-jwt').Strategy;
+const LocalStrategy     = require('passport-local').Strategy;
 const ExtractJwt        = require('passport-jwt').ExtractJwt;
 const mongoose          = require('mongoose');
 const User              = mongoose.model('users'); // Comes from bottom of User.js file where it says model
@@ -7,18 +8,25 @@ const {JSONWebToken}    = require('./keys');
 const FacebookStrategy  = require('passport-facebook');
 
 
-const opts = {}
+const optsJWT = {
+  jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey    : JSONWebToken.secret
+}
 
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken(); // Where the jwt is extracted from: the header
-opts.secretOrKey    = JSONWebToken.secret;                      // The secret key
+const optsLocal = {
+  usernameField: 'email'
+}
+
 
 /**
+ * JSON WEB TOKEN STRATEGY
  * First find where its getting the token from (the header)
  * Then, passport decodes the token and we have access to payload, and done
  * We call done when we want to exit from the function
  * We call payload when we want to access some of the token's data
  */
-passport.use(new JwtStrategy(opts, (payload, done) => {
+passport.use(new JwtStrategy(optsJWT, 
+  async (payload, done) => {
   try {
     // Find the user in the token (We have access to the payload specified in the controller signToken function)
     const user = User.findById(payload.id);
@@ -35,6 +43,35 @@ passport.use(new JwtStrategy(opts, (payload, done) => {
     done(err, false);
   }
 }))
+
+/**
+ * LOCAL STRATEGY
+ */
+passport.use(new LocalStrategy(optsLocal, 
+  async(email, password, done) => {
+    try{
+      // Find the user given the email
+      const user = await User.findOne({ email });
+
+      // If not, handle it
+      if(!user) {
+        return done(null, user);
+      }
+
+      // If found, check if password is correct
+      const isMatch = await user.isValidPassword(password);
+
+      // If not, handle it
+      if(!isMatch) {
+        return done(null, false)
+      }
+
+      // If yes, return the user
+      done(null, user)
+    } catch(err){
+        done(err, false)
+    }
+  }))
 
 
 
