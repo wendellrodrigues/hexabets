@@ -50,24 +50,16 @@ module.exports = {
 
     // Respond with token
     res.status(200).json({ token });
-
   },
 
 
   login: async(req, res, next) => {
-    const { errors, isValid } = validateLoginInput(req.body);
-
-    //Check form errors
-    if(!isValid) { 
-      res.send(200).json({ errors })
-    }
 
     //Generate token (we have access to req.user)
     const token = signToken(req.user);
 
-    //Respond with token
+    //Respond with token (Remember, this token along with the token from register can be used to access secret routes that use jwt)
     res.status(200).json({ token })
-
   },
 
   secret: async(req, res, next) => {

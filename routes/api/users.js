@@ -17,6 +17,10 @@ const passportConfig  = require('../../config/passport')
 //Load User model
 const User = require('../../models/User');
 
+//Authorization strategies
+const passportLogin = passport.authenticate('local', { session: false })
+const passportJWT   = passport.authenticate('jwt', { session: false })
+
  /*
    * When this route is called, it goes to routeHelpers/validateBody, and checks to see if the schema is valid
    * Then, if it passes, the next() function calls the UsersController.register
@@ -33,14 +37,14 @@ router
   .route('/login')
   .post(
     validateLogin,
-    passport.authenticate('local', { session: false }),
+    passportLogin,
     UsersController.login
   );
 
 router
   .route('/secret')
   .get(
-    passport.authenticate('jwt', { session: false }),
+    passportJWT,
     UsersController.secret
   );
 
