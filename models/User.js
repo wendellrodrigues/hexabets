@@ -5,6 +5,21 @@ const Schema = mongoose.Schema;
 
 // Create Schema
 const UserSchema = new Schema({
+
+  method: {
+    type: String,
+    enum: ['local', 'google', 'facebook'],
+    required: true
+  },
+  local: {
+
+  },
+  google: {
+
+  },
+  facebook: {
+
+  },
   name: {
     type: String,
     required: true

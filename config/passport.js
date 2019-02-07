@@ -4,18 +4,32 @@ const LocalStrategy     = require('passport-local').Strategy;
 const ExtractJwt        = require('passport-jwt').ExtractJwt;
 const mongoose          = require('mongoose');
 const User              = mongoose.model('users'); // Comes from bottom of User.js file where it says model
-const {JSONWebToken}    = require('./keys');
+
+const { JSONWebToken }    = require('./keys');
+const { googleAuth }      = require('./keys');
+
+const GoogleStrategy = require('passport-google-plus-token');
 const FacebookStrategy  = require('passport-facebook');
 
 
+// JWT Options
 const optsJWT = {
   jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey    : JSONWebToken.secret
 }
 
+// Google OAuth Options
+const optsGoogle = {
+  clientID: googleAuth.clientID,
+  clientSecret: googleAuth.clientSecret
+}
+
+// Local options
 const optsLocal = {
   usernameField: 'email'
 }
+
+
 
 
 /**
@@ -44,8 +58,21 @@ passport.use(new JwtStrategy(optsJWT,
   }
 }))
 
+
+/**
+ * GOOGLE OAUTH STRATEGY
+ */
+passport.use('googleToken', new GoogleStrategy(optsGoogle,
+  async(accessToken, refreshToken, profile, done) => {
+    console.log(`access token: ${accessToken}`);
+    console.log(`refresh token: ${refreshToken}`);
+    console.log(`profile ${profile}`);
+}))
+
+
 /**
  * LOCAL STRATEGY
+ * Used for email/password authentication on login
  */
 passport.use(new LocalStrategy(optsLocal, 
   async(email, password, done) => {

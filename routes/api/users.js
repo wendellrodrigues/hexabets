@@ -18,8 +18,9 @@ const passportConfig  = require('../../config/passport')
 const User = require('../../models/User');
 
 //Authorization strategies
-const passportLogin = passport.authenticate('local', { session: false })
-const passportJWT   = passport.authenticate('jwt', { session: false })
+const passportLogin   = passport.authenticate('local', { session: false });
+const passportJWT     = passport.authenticate('jwt', { session: false });
+const passportGoogle  = passport.authenticate('googleToken', { session: false });
 
  /*
    * When this route is called, it goes to routeHelpers/validateBody, and checks to see if the schema is valid
@@ -32,7 +33,6 @@ router
     validateRegister,
     UsersController.register);
  
-
 router
   .route('/login')
   .post(
@@ -40,6 +40,12 @@ router
     passportLogin,
     UsersController.login
   );
+
+router
+  .route('/oauth/google')
+  .post(
+    passportGoogle
+  )
 
 router
   .route('/secret')

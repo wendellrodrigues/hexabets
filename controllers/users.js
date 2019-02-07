@@ -62,6 +62,7 @@ module.exports = {
     res.status(200).json({ token })
   },
 
+  
   secret: async(req, res, next) => {
     console.log('UserController.secret() called')
     res.json({ secret: 'Secret accessed' });
