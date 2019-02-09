@@ -1,38 +1,33 @@
-const express                   = require('express'); //To use the router
+const passport                  = require('passport');
 const router                    = require('express-promise-router')();     // To avoid try-catch
 const UsersController           = require('../../controllers/users');
 const { validateRegister, 
         validateLogin
-                     }          = require('../../helpers/routeHelpers');
+      }                         = require('../../helpers/routeHelpers');
 
-
-const bcrypt    = require('bcryptjs'); //For hashing passwords
-const jwt       = require('jsonwebtoken');
-const keys      = require('../../config/keys');
-
-
-const passport        = require('passport');
-const passportConfig  = require('../../config/passport')
-
-//Load User model
-const User = require('../../models/User');
 
 //Authorization strategies
-const passportLogin   = passport.authenticate('local', { session: false });
-const passportJWT     = passport.authenticate('jwt', { session: false });
-const passportGoogle  = passport.authenticate('googleToken', { session: false });
+const passportLogin     = passport.authenticate('local',         { session: false });
+const passportJWT       = passport.authenticate('jwt',           { session: false });
+const passportFacebook  = passport.authenticate('facebookToken', { session: false });
 
- /*
-   * When this route is called, it goes to routeHelpers/validateBody, and checks to see if the schema is valid
-   * Then, if it passes, the next() function calls the UsersController.register
-   * Else, if it fails, the next() function will not call the UserController.register, and respond with the 400 error provided by Joi
+/**
+ * @route   POST api/users/register
+ * @desc    Registers new User / Returns JWT Token for secret routes access
+ * @access  public
  */
 router
   .route('/register')
   .post(
     validateRegister,
-    UsersController.register);
+    UsersController.register
+  );
  
+/**
+ * @route   POST api/users/login
+ * @desc    Login User / Returns JWT Token for secret routes access
+ * @access  public
+ */
 router
   .route('/login')
   .post(
@@ -41,20 +36,31 @@ router
     UsersController.login
   );
 
+/**
+ * @route   POST api/users/oauth/facebook
+ * @desc    Receives access token from facebook
+ *          Creates new user OR logs in user
+ *          Returns JWT for secret routes access
+ * @access  public
+ */
 router
-  .route('/oauth/google')
+  .route('/oauth/facebook')
   .post(
-    passportGoogle
-  )
+    passportFacebook,
+    UsersController.facebookOauth
+  );
 
+  /**
+ * @route   GET api/users/secret
+ * @desc    Test function for secret routes
+ * @access  private 
+ */
 router
   .route('/secret')
   .get(
     passportJWT,
     UsersController.secret
   );
-
-
 
 
 module.exports = router;

@@ -6,10 +6,9 @@ const mongoose          = require('mongoose');
 const User              = mongoose.model('users'); // Comes from bottom of User.js file where it says model
 
 const { JSONWebToken }    = require('./keys');
-const { googleAuth }      = require('./keys');
+const { facebookAuth }    = require('./keys');
 
-const GoogleStrategy = require('passport-google-plus-token');
-const FacebookStrategy  = require('passport-facebook');
+const FacebookStrategy  = require('passport-facebook-token');
 
 
 // JWT Options
@@ -18,17 +17,16 @@ const optsJWT = {
   secretOrKey    : JSONWebToken.secret
 }
 
-// Google OAuth Options
-const optsGoogle = {
-  clientID: googleAuth.clientID,
-  clientSecret: googleAuth.clientSecret
+// Facebook OAuth Options
+const optsFacebook = {
+  clientID:  facebookAuth.clientID,
+  clientSecret: facebookAuth.clientSecret
 }
 
-// Local options
+// Local Options
 const optsLocal = {
   usernameField: 'email'
 }
-
 
 
 
@@ -47,7 +45,7 @@ passport.use(new JwtStrategy(optsJWT,
 
     // If the user exists, return it
     if(user) {
-      return done(null, user);
+      return done(null, user); // returns done with no errors and user
     }
 
     // If not found found, return null
@@ -58,16 +56,46 @@ passport.use(new JwtStrategy(optsJWT,
   }
 }))
 
-
 /**
- * GOOGLE OAUTH STRATEGY
+ * FACEBOOK OAUTH STRATEGY
  */
-passport.use('googleToken', new GoogleStrategy(optsGoogle,
+ passport.use('facebookToken', new FacebookStrategy(optsFacebook,
   async(accessToken, refreshToken, profile, done) => {
-    console.log(`access token: ${accessToken}`);
-    console.log(`refresh token: ${refreshToken}`);
-    console.log(`profile ${profile}`);
-}))
+    try{
+      //  Check if there is an existing user. If not, create a new one
+      await User.findOne({ 'facebook.id': profile.id })
+        .then(user => {
+          if(user) {
+            console.log('user exists')
+            return done(null, profile);
+          }
+
+          // Gather name strings from facebook object
+          const firstName = profile.name.givenName;
+          const lastName = profile.name.familyName;
+          
+          // Create new user
+          console.log('creating new user');
+          const newUser = new User({
+            method: 'facebook',
+            facebook: {
+              id: profile.id,
+              firstName,
+              lastName,
+              email: profile.emails[0].value,
+            }
+          })
+          // Save user to DB
+          newUser.save();
+
+          // Continue to next func
+          done(null, newUser)
+        })
+
+    } catch(error) {
+      done(error, false, error.message)
+    }
+  }))
 
 
 /**
@@ -78,7 +106,7 @@ passport.use(new LocalStrategy(optsLocal,
   async(email, password, done) => {
     try{
       // Find the user given the email
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ 'local.email': email });
 
       // If not, handle it
       if(!user) {
@@ -99,149 +127,3 @@ passport.use(new LocalStrategy(optsLocal,
         done(err, false)
     }
   }))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const opts =  {};
-
-// opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-// opts.secretOrKey = keys.secretOrKey;
-
-// module.exports = passport => {
-
-//   passport.use('login',
-//     new JwtStrategy(opts, (jwt_payload, done) => {
-//     //Should include payload stuff from users
-//     User.findById(jwt_payload.id) //promise includes a user
-//         .then(user => {
-//             if(user) {
-//                 return done(null, user);
-//             }
-//             return done(null, false); //If user not found, still return done but false as second parameter
-//         })
-//         .catch(err => console.log(err));
-//   }));
-
-//   passport.use('facebook',
-//     new FacebookStrategy({
-//       clientID: keys.facebookAuth.clientID,
-//       clientSecret: keys.facebookAuth.clientSecret,
-//       callbackURL: keys.facebookAuth.callbackURL,
-//       profileFields:keys.facebookAuth.profileFields
-//     }, async(accessToken, refreshToken, profile, done) => {
-//         try {
-//           console.log(`profile: ${profile}`);
-//           console.log(`access token: ${accessToken}`);
-//           console.log(`refresh token: ${refreshToken}`);
-//       } catch(err) {
-//         done(err, false, err.message)
-//       }
-//     })
-  
-//   )
-
-
-
-  
-
-
-
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * 
- * passport.use('login',
-    new FacebookStrategy({
-      clientID: keys.facebookAuth.clientID,
-      clientSecret: keys.facebookAuth.clientSecret,
-      callbackURL: keys.facebookAuth.callbackURL,
-      profileFields:keys.facebookAuth.profileFields
-      }, function(accessToken, refreshToken, profile, done) {
-        console.log(profile);
-        var me = new user({
-          email:profile.emails[0].value,
-          name:profile.displayName
-        });
-
-        
-        user.findOne({email:me.email}, function(err, u) {
-          if(!u) {
-            me.save(function(err, me) {
-              if(err) return done(err);
-              done(null,me);
-            });
-          } else {
-            console.log(u);
-            done(null, u);
-          }
-        });
-      }
-  ));
-
-  passport.serializeUser(function(user, done) {
-    console.log(user);
-    done(null, user._id);
-  });
-  
-  passport.deserializeUser(function(id, done) {
-    user.findById(id, function(err, user) {
-      done(err, user);
-    });
-  });
- **/

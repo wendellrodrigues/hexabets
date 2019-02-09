@@ -13,13 +13,8 @@ const validateLoginInput = require('../validation/login');
 signToken = (payload) => {
   //Secret key
   const key = JSONWebToken.secret;
-  //Signing Options for JWT payload
-  const signOptions = {
-    issuer: 'hexabets',
-    expiresIn: '24h'
-  }
   //Create token
-  const token = jwt.sign(payload.toJSON(), key, signOptions)
+  const token = jwt.sign(JSON.stringify(payload), key)
   //return Bearer token
   return 'Bearer ' + token;
 }
@@ -27,19 +22,27 @@ signToken = (payload) => {
 
 module.exports = {
 
+  /**
+   * Register Controller
+   */
   register: async(req, res, next) => {
 
     const{  
-      name,
+      firstName,
+      lastName,
       email, 
       password,
       } = req.body;
 
     // Create new user
     const newUser = new User({ 
-                          name,
-                          email, 
-                          password,
+                          method: 'local',
+                          local: {
+                            firstName,
+                            lastName,
+                            email, 
+                            password,
+                          }
                           });
 
     // Save user to database                      
@@ -52,7 +55,9 @@ module.exports = {
     res.status(200).json({ token });
   },
 
-
+  /**
+   * Login Controller
+   */
   login: async(req, res, next) => {
 
     //Generate token (we have access to req.user)
@@ -62,7 +67,19 @@ module.exports = {
     res.status(200).json({ token })
   },
 
-  
+  /**
+   * Facebook Auth Controller
+   */
+  facebookOauth: async(req, res, next) => {
+
+    // Create and return a JWT token
+    const token = signToken(req.user);
+    res.status(200).json({ token })
+  }, 
+
+  /**
+   * Secret Routes Controller
+   */
   secret: async(req, res, next) => {
     console.log('UserController.secret() called')
     res.json({ secret: 'Secret accessed' });

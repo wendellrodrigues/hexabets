@@ -12,30 +12,40 @@ const UserSchema = new Schema({
     required: true
   },
   local: {
-
-  },
-  google: {
-
+    firstName: {
+      type: String
+    },
+    lastName: {
+      type: String
+    },
+    email: {
+      type: String,
+      lowercase: true
+    },
+    password: {
+      type: String,
+    },
+    date: {
+      type: Date,
+      default: Date.now
+    }
   },
   facebook: {
+    id: {
+      type: String
+    },
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+    email: {
+      type: String,
+      lowercase: true
+    }
+  },
 
-  },
-  name: {
-    type: String,
-    required: true
-  },
-  email: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  date: {
-    type: Date,
-    default: Date.now
-  }
 });
 
 /**
@@ -43,15 +53,22 @@ const UserSchema = new Schema({
  * Happens before .save in controller
  */
 UserSchema.pre('save', async function(next){
+
+  if(this.method !== 'local') {
+    next();
+  }
+
   try {
     // Generate a salt
     const salt = await bcrypt.genSalt(10);
 
+    const localPassword = this.local.password;
+
     // Generate a password hash (salt + hash)
-    const passwordHash = await bcrypt.hash(this.password, salt);
+    const passwordHash = await bcrypt.hash(localPassword, salt);
 
     // Reassign password to hashed password
-    this.password = passwordHash;
+    this.local.password = passwordHash;
 
     //Call next
     next();
@@ -66,7 +83,7 @@ UserSchema.pre('save', async function(next){
  */
 UserSchema.methods.isValidPassword = async function(passwordAttempt) {
   try {
-    return await bcrypt.compare(passwordAttempt, this.password);
+    return await bcrypt.compare(passwordAttempt, this.local.password);
   } catch(err) {
     throw new Error(err);
   }
