@@ -1,10 +1,13 @@
 const jwt                   = require('jsonwebtoken');
+const jwt_decode            = require('jwt-decode');
 
 const User                  = require('../models/User');
 const { JSONWebToken }      = require('../config/keys');
 
 const validateRegisterInput = require('../validation/register');
 const validateLoginInput = require('../validation/login');
+
+const secretOrKey = require('../config/keys')
 
 
 /**
@@ -85,6 +88,112 @@ module.exports = {
     res.json({ secret: 'Secret accessed' });
   },
 
+  /**
+   * Sends a Request to a local friend
+   */
+  requestLocalFriend: async(req, res, next) => {
+
+    // Decode Auth Token
+    const decodedUser = jwt_decode(req.headers.authorization);
+    const decodedUserId = decodedUser._id;
+
+    // Get Friend user (from request)
+    const localFriend = User.findById(req.params.userID)
+    //console.log(localFriend);
+
+    // Get current User (from Auth Token)
+    const thisUser = User.findById(decodedUserId)
+
+    // Update this User's friends array to include pending request
+    await User.findById(decodedUserId)
+      .then(user => {
+
+        // Check if user exists 
+        user.friends.push({
+          status: 'pending',
+          addedWhen: Date.now(),
+          friend: req.params.userID
+        })
+        user.save();
+      })
+    
+    
+
+
+
+
+
+
+
+
+
+    // Update user
+
+    //Get friend
+
+
+  },
+
+  /**
+   * Accepts Local Friend
+   */
+  acceptLocalFriend: async(req, res, next) => {
+
+
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
+
+
+// /**
+//    * Requests local friend
+//    */
+
+//   requestLocalFriend: async(req, res, next) => {
+
+//     const errors = {};
+
+//     //Get the User that is sending the request (this user)
+
+
+
+//     // Fetch the user by id 
+//     await User.findById(userId)
+//       .then(function(thisUser){
+//         console.log('this user', thisUser);
+//         return res.send(200);
+//     });
+    
+
+//     //Find the friend
+//     User.findById(req.params.userID)
+//       .then(localFriend => {
+
+//         //If friend, not found, handle it
+//         if(!localFriend) {
+//           errors.notFound = 'User not found';
+//           return res.status(400).json({errors});
+//         }
+
+//         //User.addFriend(localFriend);
+
+
+//         return res.status(200).json(localFriend);
+
+//       })
+      
+//     }

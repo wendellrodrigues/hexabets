@@ -2,7 +2,8 @@ const passport                  = require('passport');
 const router                    = require('express-promise-router')();     // To avoid try-catch
 const UsersController           = require('../../controllers/users');
 const { validateRegister, 
-        validateLogin
+        validateLogin,
+        validateFriendRequest
       }                         = require('../../helpers/routeHelpers');
 
 
@@ -61,6 +62,19 @@ router
     passportJWT,
     UsersController.secret
   );
+
+/**
+ * @route   GET api/users/addLocalFriend
+ * @desc    Adds a another local user as a friend's array of sending user
+ * @access  private
+ */
+router
+    .route('/requestLocalFriend/:userID')
+    .post(
+      passportJWT,
+      validateFriendRequest,
+      UsersController.requestLocalFriend
+    );
 
 
 module.exports = router;

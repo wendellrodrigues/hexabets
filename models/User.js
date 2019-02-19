@@ -11,6 +11,23 @@ const UserSchema = new Schema({
     enum: ['local', 'google', 'facebook'],
     required: true
   },
+
+  friends: [
+    {
+      status: {
+        type: String,
+        enum: ['requested', 'pending', 'accepted']
+      },
+      addedWhen: {
+        type: Date
+      },
+      friend: {
+        type: Schema.Types.ObjectId,
+        ref: 'users'
+      }
+    }
+  ],
+
   local: {
     firstName: {
       type: String
@@ -30,6 +47,7 @@ const UserSchema = new Schema({
       default: Date.now
     }
   },
+
   facebook: {
     id: {
       type: String
@@ -90,5 +108,42 @@ UserSchema.methods.isValidPassword = async function(passwordAttempt) {
 }
 
 
+
 module.exports = User = mongoose.model('users', UserSchema);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// /**
+//  * Adds locally found friend to User Schema
+//  */
+// UserSchema.methods.addFriend = async function(localFriend, status) {
+//   try {
+
+//     const friendToAdd = {
+//       status: status,
+//       addedWhen: Date.now,
+//       friend: localFriend
+//     }
+
+//     this.friends.push(friendToAdd);
+
+//     console.log(this)
+
+//   } catch(err) {
+//     throw new Error(err);
+//   }
+// }
 
