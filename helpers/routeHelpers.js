@@ -59,7 +59,7 @@ module.exports = {
    * Validates a Friend Request
    * Checks if Friend is in database
    * Checks if User sends a friend request to self
-   * Checks if Friend request has already been sent (pending)
+   * Checks if Friend request has already been sent (requested)
    * Checks if Friend already exists as an accepted Friend in User's friends array
    */
   validateFriendRequest: async(req, res, next) => {
@@ -97,7 +97,7 @@ module.exports = {
           if(friendToFind.friend == req.params.userID) {   // ID's match and friend is found
 
             // Check if friend request is pending
-            if(friendToFind.status == 'pending') {
+            if(friendToFind.status == 'requested') {
               errors.friendPending = 'Friend request aready sent';
               return res.status(200).json({ errors })
             }

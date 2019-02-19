@@ -97,40 +97,30 @@ module.exports = {
     const decodedUser = jwt_decode(req.headers.authorization);
     const decodedUserId = decodedUser._id;
 
-    // Get Friend user (from request)
-    const localFriend = User.findById(req.params.userID)
-    //console.log(localFriend);
+    // Get Friend user ID (from request)
+    const localFriendID = req.params.userID
 
-    // Get current User (from Auth Token)
-    const thisUser = User.findById(decodedUserId)
-
-    // Update this User's friends array to include pending request
+    // Update this User's friends array to include requested friend request
     await User.findById(decodedUserId)
       .then(user => {
-
-        // Check if user exists 
         user.friends.push({
-          status: 'pending',
+          status: 'requested',
           addedWhen: Date.now(),
-          friend: req.params.userID
+          friend: localFriendID
         })
         user.save();
       })
-    
-    
 
-
-
-
-
-
-
-
-
-    // Update user
-
-    //Get friend
-
+    // Update requested User's friends array to include pending friend request
+    await User.findById(localFriendID)
+      .then(user => {
+        user.friends.push({
+          status: 'pending',
+          addedWhen: Date.now(),
+          friend: decodedUserId
+        })
+        user.save();
+      })
 
   },
 
@@ -139,61 +129,30 @@ module.exports = {
    */
   acceptLocalFriend: async(req, res, next) => {
 
+    // Decode Auth Token
+    const decodedUser = jwt_decode(req.headers.authorization);
+    const decodedUserId = decodedUser._id;
 
+    // Get Friend user ID (from request)
+    const localFriendID = req.params.userID
 
-  }
+    // Update User friend array object to 'accepted'
+    User.findById(decodedUserId)
+      .then(thisUser => {
+        const arrayOfFriends = thisUser.friends;
+        arrayOfFriends.find(friendToFind => {
+          if(friendToFind.friend == localFriendID) {
+            console.log(friendToFind)
+          }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-
-// /**
-//    * Requests local friend
-//    */
-
-//   requestLocalFriend: async(req, res, next) => {
-
-//     const errors = {};
-
-//     //Get the User that is sending the request (this user)
-
-
-
-//     // Fetch the user by id 
-//     await User.findById(userId)
-//       .then(function(thisUser){
-//         console.log('this user', thisUser);
-//         return res.send(200);
-//     });
+      })
     
 
-//     //Find the friend
-//     User.findById(req.params.userID)
-//       .then(localFriend => {
-
-//         //If friend, not found, handle it
-//         if(!localFriend) {
-//           errors.notFound = 'User not found';
-//           return res.status(400).json({errors});
-//         }
-
-//         //User.addFriend(localFriend);
+    // Update requeser's friend array object to 'accepted'
 
 
-//         return res.status(200).json(localFriend);
+  })
 
-//       })
-      
-//     }
+
+}}
+
