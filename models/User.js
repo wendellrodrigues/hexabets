@@ -14,16 +14,16 @@ const UserSchema = new Schema({
 
   friends: [
     {
+      friendID: {
+        type: Schema.Types.ObjectId,
+        ref: 'users'
+      },
       status: {
         type: String,
         enum: ['requested', 'pending', 'accepted']
       },
       addedWhen: {
         type: Date
-      },
-      friend: {
-        type: Schema.Types.ObjectId,
-        ref: 'users'
       }
     }
   ],

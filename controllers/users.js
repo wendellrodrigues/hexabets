@@ -1,5 +1,6 @@
 const jwt                   = require('jsonwebtoken');
 const jwt_decode            = require('jwt-decode');
+ObjectId                    = require('mongodb').ObjectID;
 
 const User                  = require('../models/User');
 const { JSONWebToken }      = require('../config/keys');
@@ -106,7 +107,7 @@ module.exports = {
         user.friends.push({
           status: 'requested',
           addedWhen: Date.now(),
-          friend: localFriendID
+          friendID: localFriendID
         })
         user.save();
       })
@@ -117,10 +118,12 @@ module.exports = {
         user.friends.push({
           status: 'pending',
           addedWhen: Date.now(),
-          friend: decodedUserId
+          friendID: decodedUserId
         })
         user.save();
       })
+    
+    res.status(200);
 
   },
 
@@ -131,28 +134,45 @@ module.exports = {
 
     // Decode Auth Token
     const decodedUser = jwt_decode(req.headers.authorization);
-    const decodedUserId = decodedUser._id;
+    const accepterID = decodedUser._id;
 
     // Get Friend user ID (from request)
-    const localFriendID = req.params.userID
+    const requesterID = req.params.userID
+
 
     // Update User friend array object to 'accepted'
-    User.findById(decodedUserId)
-      .then(thisUser => {
-        const arrayOfFriends = thisUser.friends;
-        arrayOfFriends.find(friendToFind => {
-          if(friendToFind.friend == localFriendID) {
-            console.log(friendToFind)
-          }
+    await User.findById(accepterID)
+      .then(accepter => {
+        user.findOneAndUpdate({_id : accepter._id},{ $set: { "friends.$.status" : "accepted" }})
+        accepter.update(
+          { "friends.friendID" : requesterID }, 
+          { $set: { "friends.$.status" : "accepted" }},
 
+
+        )
       })
+      res.json(decodedUser)
+    }
+
+
+
+
+
+
+
+
+
+  }
+
+
+        
     
 
-    // Update requeser's friend array object to 'accepted'
-
-
-  })
-
-
-}}
-
+    // // Update requeser's friend array object to 'accepted'
+    // User.findById(requesterID)
+    //   .then(requester => {
+    //     const arrayOfFriends = requester.friends;
+    //     arrayOfFriends.find(accepter => {
+    //       if(accepter.friendID == accepterID) {
+    //         accepter.update({
+    //           status: 'accepted'

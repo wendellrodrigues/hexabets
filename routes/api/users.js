@@ -76,5 +76,12 @@ router
       UsersController.requestLocalFriend
     );
 
+router 
+  .route('/acceptLocalFriend/:userID')
+  .post(
+    passportJWT,
+    UsersController.acceptLocalFriend
+  )
+
 
 module.exports = router;
