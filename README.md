@@ -2,9 +2,9 @@
 Web application for peer-betting application
 
 
-Does not include keys file /config/keys.js
+Does not include keys file in design phase
 
-Keys file includes 
+Keys file includes @ /config/keys.js
 
     module.exports = {
       mongoURI:********,
@@ -15,8 +15,7 @@ Keys file includes
       'clientSecret'  : ********
 
     },
-
-
+    
     JSONWebToken : {
       secret :********
     },
