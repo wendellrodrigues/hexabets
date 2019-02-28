@@ -5,10 +5,11 @@ ObjectId                    = require('mongodb').ObjectID;
 const User                  = require('../models/User');
 const { JSONWebToken }      = require('../config/keys');
 
-const validateRegisterInput = require('../validation/register');
-const validateLoginInput = require('../validation/login');
 
-const secretOrKey = require('../config/keys')
+const validateRegisterInput = require('../validation/register');
+const validateLoginInput    = require('../validation/login');
+
+const secretOrKey           = require('../config/keys')
 
 
 /**
@@ -139,40 +140,23 @@ module.exports = {
     // Get Friend user ID (from request)
     const requesterID = req.params.userID
 
+    // Update accepter friend array object to 'accepted'
+    await User.update({
+        '_id': ObjectId(accepterID), 
+        'friends.friendID': requesterID}, 
+        { $set : { 'friends.$.status': 'accepted' } })
 
-    // Update User friend array object to 'accepted'
-    await User.findById(accepterID)
-      .then(accepter => {
-        user.findOneAndUpdate({_id : accepter._id},{ $set: { "friends.$.status" : "accepted" }})
-        accepter.update(
-          { "friends.friendID" : requesterID }, 
-          { $set: { "friends.$.status" : "accepted" }},
-
-
-        )
-      })
-      res.json(decodedUser)
-    }
-
-
-
-
-
-
-
-
+    // Update requester friend array object to 'accepted'
+    await User.update({
+      '_id': ObjectId(requesterID), 
+      'friends.friendID': accepterID}, 
+      { $set : { 'friends.$.status': 'accepted' } })
 
   }
 
 
-        
-    
 
-    // // Update requeser's friend array object to 'accepted'
-    // User.findById(requesterID)
-    //   .then(requester => {
-    //     const arrayOfFriends = requester.friends;
-    //     arrayOfFriends.find(accepter => {
-    //       if(accepter.friendID == accepterID) {
-    //         accepter.update({
-    //           status: 'accepted'
+
+
+}
+
