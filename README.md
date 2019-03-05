@@ -2,6 +2,7 @@
 Web application for peer-betting application
 
 Server created with Node.js and Express.js
+
 Front end will be created using React.js with CSS Grid
 
 Uses passport and jwt token authentication (stateless)
