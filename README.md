@@ -15,8 +15,8 @@ Does not include keys file in design phase
 Keys file includes @ /config/keys.js
 
     module.exports = {
-      mongoURI:********,
-      secretOrKey: ********
+      mongoURI        :********,
+      secretOrKey     : ********
 
     facebookAuth : {
       'clientID'      : ********
@@ -25,5 +25,5 @@ Keys file includes @ /config/keys.js
     },
     
     JSONWebToken : {
-      secret :********
+      secret          :********
     },
