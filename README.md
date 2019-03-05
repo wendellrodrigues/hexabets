@@ -15,15 +15,15 @@ Does not include keys file in design phase
 Keys file includes @ /config/keys.js
 
     module.exports = {
-      mongoURI        :********,
-      secretOrKey     : ********
+      mongoURI        : '********',
+      secretOrKey     : '********'
 
     facebookAuth : {
-      'clientID'      : ********
-      'clientSecret'  : ********
+      'clientID'      : '********',
+      'clientSecret'  : '********'
 
     },
     
     JSONWebToken : {
-      secret          :********
+      secret          : '********'
     },
