@@ -17,11 +17,11 @@ Keys file includes @ /config/keys.js
     module.exports = {
       mongoURI        : '********',
       secretOrKey     : '********'
+    },
 
     facebookAuth : {
       'clientID'      : '********',
       'clientSecret'  : '********'
-
     },
     
     JSONWebToken : {
